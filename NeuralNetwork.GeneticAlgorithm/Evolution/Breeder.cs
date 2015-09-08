@@ -15,13 +15,16 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
         private readonly INeuralNetworkFactory _networkFactory;
         private readonly IWeightInitializer _weightInitializer;
         private double _motherFatherBias;
-
-
-        public Breeder(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, double motherFatherBias = 0.5)
+        private Breeder(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, double motherFatherBias = 0.5)
         {
             _networkFactory = networkFactory;
             _weightInitializer = weightInitializer;
             _motherFatherBias = motherFatherBias;
+        }
+
+        public static IBreeder GetInstance(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, double motherFatherBias = 0.5)
+        {
+            return new Breeder(networkFactory, weightInitializer, motherFatherBias);
         }
 
         public IList<INeuralNetwork> Breed(IList<ITrainingSession> sessions, int numToBreed)
