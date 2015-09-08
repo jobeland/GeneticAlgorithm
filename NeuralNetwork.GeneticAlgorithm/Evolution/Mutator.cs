@@ -18,11 +18,16 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
         private readonly IWeightInitializer _weightInitializer;
         private readonly MutationConfigurationSettings _config;
 
-        public Mutator(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, MutationConfigurationSettings config)
+        private Mutator(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, MutationConfigurationSettings config)
         {
             _networkFactory = networkFactory;
             _weightInitializer = weightInitializer;
             _config = config;
+        }
+
+        public static IMutator GetInstance(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, MutationConfigurationSettings config)
+        {
+            return new Mutator(networkFactory, weightInitializer, config);
         }
 
         public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance)
