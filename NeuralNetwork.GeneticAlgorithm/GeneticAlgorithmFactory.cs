@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork.Factories;
+using ArtificialNeuralNetwork.WeightInitializer;
 using NeuralNetwork.GeneticAlgorithm.Evaluatable;
 using NeuralNetwork.GeneticAlgorithm.Evolution;
 using NeuralNetwork.GeneticAlgorithm.Utils;
@@ -29,6 +30,16 @@ namespace NeuralNetwork.GeneticAlgorithm
 
         public static IGeneticAlgorithmFactory GetInstance(INeuralNetworkFactory networkFactory, IEvalWorkingSetFactory workingSetFactory, IEvaluatableFactory evaluatableFactory, IBreederFactory breederFactory, IMutatorFactory mutatorFactory)
         {
+            return new GeneticAlgorithmFactory(networkFactory, workingSetFactory, evaluatableFactory, breederFactory, mutatorFactory);
+        }
+
+        public static IGeneticAlgorithmFactory GetInstance(IEvaluatableFactory evaluatableFactory)
+        {
+            var networkFactory = NeuralNetworkFactory.GetInstance();
+            var workingSetFactory = EvalWorkingSetFactory.GetInstance();
+            var random = new Random();
+            var breederFactory = BreederFactory.GetInstance(networkFactory, new RandomWeightInitializer(random));
+            var mutatorFactory = MutatorFactory.GetInstance(networkFactory, new RandomWeightInitializer(random));
             return new GeneticAlgorithmFactory(networkFactory, workingSetFactory, evaluatableFactory, breederFactory, mutatorFactory);
         }
 
