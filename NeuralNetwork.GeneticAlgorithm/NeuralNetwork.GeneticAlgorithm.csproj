@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Evolution\Breeder.cs" />
+    <Compile Include="IGeneticAlgorithm.cs" />
     <Compile Include="Utils\EvalWorkingSet.cs" />
     <Compile Include="Evolution\EvolutionConfigurationSettings.cs" />
     <Compile Include="Evolution\Generation.cs" />

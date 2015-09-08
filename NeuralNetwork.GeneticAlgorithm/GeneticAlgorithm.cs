@@ -17,7 +17,7 @@ using NeuralNetwork.GeneticAlgorithm.Utils;
 namespace NeuralNetwork.GeneticAlgorithm
 {
 
-    public class GeneticAlgorithm
+    public class GeneticAlgorithm : IGeneticAlgorithm
     {
         private INeuralNetworkFactory _networkFactory;
         private readonly IEvalWorkingSet _history;
@@ -32,6 +32,7 @@ namespace NeuralNetwork.GeneticAlgorithm
 
         private double _mutateChance;
         private Generation _generation;
+        private ITrainingSession _bestPerformerOfEpoch;
 
 
         public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
@@ -51,11 +52,9 @@ namespace NeuralNetwork.GeneticAlgorithm
                 sessions.Add(new TrainingSession(network, _evaluatableFactory.Create(network), i));
             }
             _generation = new Generation(sessions, _generationConfig);
-
-
         }
 
-        public void runEpoch()
+        public void RunSimulation()
         {
             for (int epoch = 0; epoch < _evolutionConfig.NumEpochs; epoch++)
             {
@@ -80,7 +79,26 @@ namespace NeuralNetwork.GeneticAlgorithm
 
                 }
                 SaveBestPerformer(epoch);
+                _bestPerformerOfEpoch = GetBestPerformerOfGeneration();
+            } 
+        }
+
+        public INeuralNetwork GetBestPerformer()
+        {
+            if (_bestPerformerOfEpoch == null)
+            {
+                throw new InvalidOperationException("Cannot return best performer before simulation is complete");
             }
+            return _bestPerformerOfEpoch.NeuralNet;
+        }
+
+        internal ITrainingSession GetBestPerformerOfGeneration()
+        {
+            if (_generation == null)
+            {
+                throw new InvalidOperationException("Cannot return best performer before generation is simulated");
+            }
+            return _generation.GetBestPerformer();
         }
 
         internal void SaveBestPerformer(int epoch)
