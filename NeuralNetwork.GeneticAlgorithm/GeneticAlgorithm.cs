@@ -30,7 +30,6 @@ namespace NeuralNetwork.GeneticAlgorithm
         private readonly IBreeder _breeder;
         private readonly IMutator _mutator;
 
-        private double _mutateChance;
         private Generation _generation;
         private ITrainingSession _bestPerformerOfEpoch;
 
@@ -125,14 +124,14 @@ namespace NeuralNetwork.GeneticAlgorithm
 
             _history.AddEval(sessions[0].GetSessionEvaluation());
 
+            var mutateChance = _evolutionConfig.NormalMutationRate;
             if (_history.IsStale())
             {
-                _mutateChance = _evolutionConfig.HighMutationRate;
+                mutateChance = _evolutionConfig.HighMutationRate;
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
             }
             else
             {
-                _mutateChance = _evolutionConfig.NormalMutationRate;
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
             }
 
@@ -150,7 +149,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             List<INeuralNetwork> toTryMutate = new List<INeuralNetwork>();
             toTryMutate.AddRange(toKeep);
             toTryMutate.AddRange(newNetworks);
-            IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, _mutateChance);
+            IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, mutateChance);
 
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
             allToAdd.AddRange(children);
