@@ -34,8 +34,7 @@ namespace NeuralNetwork.GeneticAlgorithm
         private Generation _generation;
         private ITrainingSession _bestPerformerOfEpoch;
 
-
-        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
+        private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
@@ -52,6 +51,11 @@ namespace NeuralNetwork.GeneticAlgorithm
                 sessions.Add(new TrainingSession(network, _evaluatableFactory.Create(network), i));
             }
             _generation = new Generation(sessions, _generationConfig);
+        }
+
+        public static IGeneticAlgorithm GetInstance(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
+        {
+            return new GeneticAlgorithm(networkConfig, generationConfig, evolutionConfig, networkFactory, breeder, mutator, workingSet, evaluatableFactory);
         }
 
         public void RunSimulation()
