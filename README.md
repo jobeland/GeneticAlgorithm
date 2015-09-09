@@ -63,6 +63,29 @@ EvolutionConfigurationSettings evolutionSettings = new EvolutionConfigurationSet
 IGeneticAlgorithm evolver = factory.Create(networkConfig, generationSettings, evolutionSettings);
 ```
 
+Additionally, we can override the factories for `IBreeder`, `IMutator`, and `IEvalWorkingSet` by injecting the objects to the `Create()` method. A good reason for doing this is if you desire to override the default mutation settings, you can do so specifying your own `MutationConfigurationSettings`:
+```
+MutationConfigurationSettings mutationSettings = new MutationConfigurationSettings
+            {
+                MutateAxonActivationFunction = true,
+                MutateNumberOfHiddenLayers = true,
+                MutateNumberOfHiddenNeuronsInLayer = true,
+                MutateSomaBiasFunction = true,
+                MutateSomaSummationFunction = true,
+                MutateSynapseWeights = true
+            };
+            
+var random = new RandomWeightInitializer(new Random());
+INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance();
+IBreeder breeder = BreederFactory.GetInstance(factory, random).Create();
+IMutator mutator = MutatorFactory.GetInstance(factory, random).Create(mutationSettings);
+IEvalWorkingSet history = EvalWorkingSetFactory.GetInstance().Create(50);
+IEvaluatableFactory evaluatableFactory = new GameEvaluationFactory();
+
+var GAFactory = GeneticAlgorithmFactory.GetInstance(evaluatableFactory);
+IGeneticAlgorithm evolver = GAFactory.Create(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator, history, evaluatableFactory);
+```
+
 ### Using the Genetic Algorithm
 Once created, using the algorithm requires running it, and getting the result.
 ```c#
@@ -70,6 +93,7 @@ evolver.RunSimulation();
 ...
 INeuralNetwork best = evolver.GetBestPerformer();
 ```
+
 
 
 
