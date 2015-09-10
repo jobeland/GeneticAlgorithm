@@ -94,6 +94,31 @@ evolver.RunSimulation();
 INeuralNetwork best = evolver.GetBestPerformer();
 ```
 
+### Creating IEvaluatable and IEvaluatableFactory
+In order for the Genetic Algorithm to evolve your network, it needs a means of running the scenario you wish to optimize for, and a way to evaluate its performance of that scenario. The way to do this is by implementing `IEvaluatable`, and passing in an `IEvaluatableFactory` to the Genetic Algorithm. 
+##### IEvaluatable
+The IEvaluatable interface contains the following two methods:
+```c#
+public interface IEvaluatable
+{
+    void RunEvaluation();
+    double GetEvaluation();
+}
+```
+Where `RunEvaluation()` is called by the algorithm to run your given scenario, and `GetEvaluation()` is called afterwards to determine the performance of that given scenario. An example implemenation can be found in the [BasicGameNeuralNetworkTrainer](https://github.com/jobeland/BasicGameNeuralNetworkTrainer) repo in [GameEvaluation.cs](https://github.com/jobeland/BasicGameNeuralNetworkTrainer/blob/master/Trainer/GameEvaluation.cs)
+##### IEvaluatableFactory
+The IEvaluatableFactory is used by the Genetic Algorithm during each training session to create a new instance of the scenario to run and evaluate. Your factory only needs to implement the following method:
+```c#
+public interface IEvaluatableFactory
+{
+    IEvaluatable Create(INeuralNetwork neuralNetwork);
+}
+```
+`Create()` only requires the `INeuralNetwork` to use for that session to be passed in, the rest can be handled by your factory. An example of this can be found in the [BasicGameNeuralNetworkTrainer](https://github.com/jobeland/BasicGameNeuralNetworkTrainer) repo in [GameEvaluationFactory.cs](https://github.com/jobeland/BasicGameNeuralNetworkTrainer/blob/master/Trainer/GameEvaluationFactory.cs)
+
+
+
+
 
 
 
