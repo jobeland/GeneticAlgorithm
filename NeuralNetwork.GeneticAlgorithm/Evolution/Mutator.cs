@@ -73,12 +73,17 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             {
                 int layerToReplace = random.Next(newGenes.HiddenGenes.Count);
 
+                int hiddenLayerSize = DetermineNumberOfHiddenNeuronsInLayer(genes, mutateChance, random);
+
                 //update layer-1 axon terminals
                 LayerGene previousLayer = GetPreviousLayerGene(newGenes, layerToReplace);
                 foreach (NeuronGene neuron in previousLayer.Neurons)
                 {
                     neuron.Axon.Weights.Clear();
-                    neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                    for (int i = 0; i < hiddenLayerSize; i++)
+                    {
+                        neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                    } 
                 }
 
                 LayerGene newLayer = new LayerGene
@@ -87,10 +92,39 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
                 };
                 newGenes.HiddenGenes.Insert(layerToReplace, newLayer);
 
-                var newNeuron = GetRandomHiddenNeuronGene(newGenes, layerToReplace, random);
-                newGenes.HiddenGenes[layerToReplace].Neurons.Add(newNeuron);
+                for (int i = 0; i < hiddenLayerSize; i++)
+                {
+                    var newNeuron = GetRandomHiddenNeuronGene(newGenes, layerToReplace, random);
+                    newGenes.HiddenGenes[layerToReplace].Neurons.Add(newNeuron);
+                }  
             }
             return newGenes;
+        }
+
+        internal int DetermineNumberOfHiddenNeuronsInLayer(NeuralNetworkGene networkGenes, double mutateChance, Random random)
+        {
+            int hiddenLayerSize = networkGenes.InputGene.Neurons.Count;
+            bool increase = true;
+            if (random.NextDouble() <= 0.5)
+            {
+                increase = false;
+            }
+            while (random.NextDouble() <= mutateChance)
+            {
+                if (!increase && hiddenLayerSize == 1)
+                {
+                    break;
+                }
+                else if (!increase)
+                {
+                    hiddenLayerSize--;
+                }
+                else
+                {
+                    hiddenLayerSize++;
+                }
+            }
+            return hiddenLayerSize;
         }
 
         internal LayerGene TryAddNeuronsToLayer(NeuralNetworkGene networkGenes, int hiddenLayerIndex, double mutateChance, Random random)
