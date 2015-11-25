@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 namespace NeuralNetwork.GeneticAlgorithm.Evolution
 {
-    interface IGeneration
+    public interface IGeneration
     {
         ITrainingSession GetBestPerformer();
         IList<ITrainingSession> GetBestPerformers(int numPerformers);
