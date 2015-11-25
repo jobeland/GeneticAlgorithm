@@ -58,7 +58,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             return new GeneticAlgorithm(networkConfig, generationConfig, evolutionConfig, networkFactory, breeder, mutator, workingSet, evaluatableFactory);
         }
 
-        public void RunSimulation()
+        public async void RunSimulation()
         {
             for (int epoch = 0; epoch < _evolutionConfig.NumEpochs; epoch++)
             {
@@ -86,7 +86,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                 }
                 if (_epochAction != null)
                 {
-                    _bestPerformerOfEpoch = _epochAction.UpdateBestPerformer(_generation, epoch);
+                    _bestPerformerOfEpoch = await _epochAction.UpdateBestPerformer(_generation, epoch);
                 }
                 else
                 {

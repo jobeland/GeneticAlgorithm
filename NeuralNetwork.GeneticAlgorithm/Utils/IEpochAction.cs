@@ -9,6 +9,6 @@ namespace NeuralNetwork.GeneticAlgorithm.Utils
 {
     public interface IEpochAction
     {
-        ITrainingSession UpdateBestPerformer(IGeneration lastGenerationOfEpoch, int epochNumber);
+        Task<ITrainingSession> UpdateBestPerformer(IGeneration lastGenerationOfEpoch, int epochNumber);
     }
 }
