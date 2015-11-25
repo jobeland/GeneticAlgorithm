@@ -30,7 +30,7 @@ namespace NeuralNetwork.GeneticAlgorithm
         private readonly IBreeder _breeder;
         private readonly IMutator _mutator;
 
-        private Generation _generation;
+        private IGeneration _generation;
         private ITrainingSession _bestPerformerOfEpoch;
 
         private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
@@ -69,15 +69,13 @@ namespace NeuralNetwork.GeneticAlgorithm
                     }
                     _generation.Run();
 
-                    var evals = _generation.GetEvalsForGeneration();
+                    var evals = _generation.GetEvalsForGeneration().OrderBy(d => d).ToList();
 
-                    int count = 0;
-                    for (int i = 0; i < evals.Length; i++)
+                    for (int i = 0; i < evals.Count; i++)
                     {
-                        count++;
                         LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", evals[i]));
                     }
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", evals.Count));
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
 
                 }

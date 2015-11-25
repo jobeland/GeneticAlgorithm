@@ -59,6 +59,7 @@
     <Compile Include="Evolution\Breeder.cs" />
     <Compile Include="Evolution\BreederFactory.cs" />
     <Compile Include="Evolution\IBreederFactory.cs" />
+    <Compile Include="Evolution\IGeneration.cs" />
     <Compile Include="Evolution\IMutatorFactory.cs" />
     <Compile Include="Evolution\MutatorFactory.cs" />
     <Compile Include="GeneticAlgorithmFactory.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Evaluatable\IEvaluatable.cs" />
     <Compile Include="Evaluatable\IEvaluatableFactory.cs" />
     <Compile Include="Utils\EvalWorkingSetFactory.cs" />
+    <Compile Include="Utils\IEpochAction.cs" />
     <Compile Include="Utils\IEvalWorkingSet.cs" />
     <Compile Include="Evolution\IMutator.cs" />
     <Compile Include="Utils\IEvalWorkingSetFactory.cs" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetwork.GeneticAlgorithm.Evolution
 {
-    public class Generation
+    public class Generation : IGeneration
     {
         private double[] _evals { get; set; }
         private IList<ITrainingSession> _sessions;
