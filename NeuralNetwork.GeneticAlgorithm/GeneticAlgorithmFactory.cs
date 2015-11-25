@@ -43,9 +43,9 @@ namespace NeuralNetwork.GeneticAlgorithm
             return new GeneticAlgorithmFactory(networkFactory, workingSetFactory, evaluatableFactory, breederFactory, mutatorFactory);
         }
 
-        public IGeneticAlgorithm Create(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
+        public IGeneticAlgorithm Create(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction)
         {
-            return GeneticAlgorithm.GetInstance(networkConfig, generationConfig, evolutionConfig, _networkFactory, breeder, mutator, workingSet, _evaluatableFactory);
+            return GeneticAlgorithm.GetInstance(networkConfig, generationConfig, evolutionConfig, _networkFactory, breeder, mutator, workingSet, _evaluatableFactory, epochAction);
         }
 
         public IGeneticAlgorithm Create(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig)
@@ -53,7 +53,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             var breeder = _breederFactory.Create();
             var mutator = _mutatorFactory.Create();
             var workingSet = _workingSetFactory.Create();
-            return GeneticAlgorithm.GetInstance(networkConfig, generationConfig, evolutionConfig, _networkFactory, breeder, mutator, workingSet, _evaluatableFactory);
+            return GeneticAlgorithm.GetInstance(networkConfig, generationConfig, evolutionConfig, _networkFactory, breeder, mutator, workingSet, _evaluatableFactory, null);
         }
 
         public IGeneticAlgorithm Create(NeuralNetworkConfigurationSettings networkConfig)
@@ -73,7 +73,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                 NormalMutationRate = 0.05,
                 NumEpochs = 10
             };
-            return GeneticAlgorithm.GetInstance(networkConfig, generationConfig, evolutionConfig, _networkFactory, breeder, mutator, workingSet, _evaluatableFactory);
+            return GeneticAlgorithm.GetInstance(networkConfig, generationConfig, evolutionConfig, _networkFactory, breeder, mutator, workingSet, _evaluatableFactory, null);
         }
 
     }

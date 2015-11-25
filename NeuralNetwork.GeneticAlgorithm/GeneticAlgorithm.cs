@@ -34,11 +34,12 @@ namespace NeuralNetwork.GeneticAlgorithm
         private ITrainingSession _bestPerformerOfEpoch;
         private IEpochAction _epochAction;
 
-        private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
+        private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
+            _epochAction = _epochAction;
             var sessions = new List<ITrainingSession>();
             _networkFactory = networkFactory;
             _breeder = breeder;
@@ -53,12 +54,12 @@ namespace NeuralNetwork.GeneticAlgorithm
             _generation = new Generation(sessions, _generationConfig);
         }
 
-        public static IGeneticAlgorithm GetInstance(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
+        public static IGeneticAlgorithm GetInstance(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction)
         {
-            return new GeneticAlgorithm(networkConfig, generationConfig, evolutionConfig, networkFactory, breeder, mutator, workingSet, evaluatableFactory);
+            return new GeneticAlgorithm(networkConfig, generationConfig, evolutionConfig, networkFactory, breeder, mutator, workingSet, evaluatableFactory, epochAction);
         }
 
-        public async void RunSimulation()
+        public void RunSimulation()
         {
             for (int epoch = 0; epoch < _evolutionConfig.NumEpochs; epoch++)
             {
@@ -86,7 +87,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                 }
                 if (_epochAction != null)
                 {
-                    _bestPerformerOfEpoch = await _epochAction.UpdateBestPerformer(_generation, epoch);
+                    _bestPerformerOfEpoch = _epochAction.UpdateBestPerformer(_generation, epoch);
                 }
                 else
                 {
