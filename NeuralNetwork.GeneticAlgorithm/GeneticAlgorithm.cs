@@ -32,6 +32,7 @@ namespace NeuralNetwork.GeneticAlgorithm
 
         private IGeneration _generation;
         private ITrainingSession _bestPerformerOfEpoch;
+        private IEpochAction _epochAction;
 
         private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
         {
@@ -65,7 +66,11 @@ namespace NeuralNetwork.GeneticAlgorithm
                 {
                     if (epoch != 0 || generation != 0)
                     {
-                        createNextGeneration();
+                        createNextGeneration(null);
+                    }
+                    else if (epoch != 0 && generation == 0)
+                    {
+                        createNextGeneration(_bestPerformerOfEpoch);
                     }
                     _generation.Run();
 
@@ -79,9 +84,16 @@ namespace NeuralNetwork.GeneticAlgorithm
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
 
                 }
+                if (_epochAction != null)
+                {
+                    _bestPerformerOfEpoch = _epochAction.UpdateBestPerformer(_generation, epoch);
+                }
+                else
+                {
+                    _bestPerformerOfEpoch = GetBestPerformerOfGeneration();
+                }
                 SaveBestPerformer(epoch);
-                _bestPerformerOfEpoch = GetBestPerformerOfGeneration();
-            } 
+            }
         }
 
         public INeuralNetwork GetBestPerformer()
@@ -109,7 +121,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             saver.SaveNeuralNetwork(bestPerformer.NeuralNet, bestPerformer.GetSessionEvaluation(), epoch);
         }
 
-        private void createNextGeneration()
+        private void createNextGeneration(ITrainingSession bestPerformer)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
@@ -119,6 +131,10 @@ namespace NeuralNetwork.GeneticAlgorithm
             int numToGen = (int)(_generationConfig.GenerationPopulation * 0.15);
 
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
+            if (bestPerformer != null)
+            {
+                sessions[0] = bestPerformer;
+            }
 
             _history.AddEval(sessions[0].GetSessionEvaluation());
 
