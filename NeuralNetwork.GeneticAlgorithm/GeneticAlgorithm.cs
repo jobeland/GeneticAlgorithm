@@ -39,7 +39,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
-            _epochAction = _epochAction;
+            _epochAction = epochAction;
             var sessions = new List<ITrainingSession>();
             _networkFactory = networkFactory;
             _breeder = breeder;
