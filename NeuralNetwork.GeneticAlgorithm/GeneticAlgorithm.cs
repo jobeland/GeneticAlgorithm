@@ -65,13 +65,13 @@ namespace NeuralNetwork.GeneticAlgorithm
             {
                 for (int generation = 0; generation < _evolutionConfig.GenerationsPerEpoch; generation++)
                 {
-                    if (epoch != 0 || generation != 0)
-                    {
-                        createNextGeneration(null);
-                    }
-                    else if (epoch != 0 && generation == 0)
+                    if (epoch != 0 && generation == 0)
                     {
                         createNextGeneration(_bestPerformerOfEpoch);
+                    }
+                    else if (epoch != 0 || generation != 0)
+                    {
+                        createNextGeneration(null);
                     }
                     _generation.Run();
 
