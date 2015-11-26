@@ -61,15 +61,16 @@ namespace NeuralNetwork.GeneticAlgorithm
 
         public void RunSimulation()
         {
-            for (int epoch = 0; epoch < _evolutionConfig.NumEpochs; epoch++)
+            RunStarterGeneration();
+            for (int epoch = 1; epoch < _evolutionConfig.NumEpochs; epoch++)
             {
                 for (int generation = 0; generation < _evolutionConfig.GenerationsPerEpoch; generation++)
                 {
-                    if (epoch != 0 && generation == 0)
+                    if (generation == 0)
                     {
                         createNextGeneration(_bestPerformerOfEpoch);
                     }
-                    else if (epoch != 0 || generation != 0)
+                    else
                     {
                         createNextGeneration(null);
                     }
@@ -94,6 +95,18 @@ namespace NeuralNetwork.GeneticAlgorithm
                     _bestPerformerOfEpoch = GetBestPerformerOfGeneration();
                 }
                 SaveBestPerformer(epoch);
+            }
+        }
+
+        internal void RunStarterGeneration(){
+            _generation.Run();
+            if (_epochAction != null)
+            {
+                _bestPerformerOfEpoch = _epochAction.UpdateBestPerformer(_generation, 0);
+            }
+            else
+            {
+                _bestPerformerOfEpoch = GetBestPerformerOfGeneration();
             }
         }
 
