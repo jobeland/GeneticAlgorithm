@@ -165,14 +165,10 @@ namespace NeuralNetwork.GeneticAlgorithm
             }
 
             IList<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
-
-            IList<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
-            int numToLiveOn = toKeep.Count / 10;
-            IList<INeuralNetwork> liveOn = toKeep.Take(numToLiveOn).ToList();
-            for (int i = 0; i < numToLiveOn; i++)
-            {
-                toKeep.RemoveAt(0);
-            }
+            var newSessions = new List<ITrainingSession>();
+            //Allow the very top numToLiveOn sessions to be added to next generation untouched
+            int numToLiveOn = sessions.Count / 10;
+            newSessions.AddRange(sessions.Take(numToLiveOn));
             IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
 
             List<INeuralNetwork> toTryMutate = new List<INeuralNetwork>();
@@ -183,9 +179,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
             allToAdd.AddRange(children);
             allToAdd.AddRange(maybeMutated);
-            allToAdd.AddRange(liveOn);
 
-            var newSessions = new List<ITrainingSession>();
             for (int net = 0; net < allToAdd.Count; net++)
             {
                 newSessions.Add(new TrainingSession(allToAdd[net], _evaluatableFactory.Create(allToAdd[net]), net));
