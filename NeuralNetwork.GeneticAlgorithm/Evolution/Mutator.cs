@@ -17,12 +17,14 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
         private readonly INeuralNetworkFactory _networkFactory;
         private readonly IWeightInitializer _weightInitializer;
         private readonly MutationConfigurationSettings _config;
+        private readonly Random _random;
 
         private Mutator(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, MutationConfigurationSettings config)
         {
             _networkFactory = networkFactory;
             _weightInitializer = weightInitializer;
             _config = config;
+            _random = new Random();
         }
 
         public static IMutator GetInstance(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, MutationConfigurationSettings config)
@@ -30,50 +32,64 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             return new Mutator(networkFactory, weightInitializer, config);
         }
 
-        public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance)
+        public INeuralNetwork Mutate(INeuralNetwork network, double mutateChance, out bool didMutate)
+        {
+            NeuralNetworkGene childGenes = network.GetGenes();
+            bool mutated;
+            didMutate = false;
+            if (_config.MutateNumberOfHiddenLayers)
+            {
+                childGenes = TryAddLayerToNetwork(childGenes, mutateChance, out mutated);
+                didMutate = mutated;
+
+            }
+            for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
+            {
+                var neuron = childGenes.InputGene.Neurons[n];
+                childGenes.InputGene.Neurons[n] = TryMutateNeuron(neuron, mutateChance, out mutated);;
+                didMutate = didMutate || mutated;
+            }
+
+            for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
+            {
+                if (_config.MutateNumberOfHiddenNeuronsInLayer)
+                {
+                    childGenes.HiddenGenes[h] = TryAddNeuronsToLayer(childGenes, h, mutateChance, out mutated);
+                    didMutate = didMutate || mutated;
+                }
+
+                for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
+                {
+                    var neuron = childGenes.HiddenGenes[h].Neurons[j];
+                    childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, mutateChance, out mutated);
+                    didMutate = didMutate || mutated;
+                }
+            }
+            return _networkFactory.Create(childGenes);
+        }
+
+        public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance, out bool didMutate)
         {
             List<INeuralNetwork> completed = new List<INeuralNetwork>();
-            Random random = new Random();
+            didMutate = false;
             foreach (INeuralNetwork net in networks)
             {
-                NeuralNetworkGene childGenes = net.GetGenes();
-                if (_config.MutateNumberOfHiddenLayers)
-                {
-                    childGenes = TryAddLayerToNetwork(childGenes, mutateChance, random);
-                }
-
-                for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
-                {
-                    var neuron = childGenes.InputGene.Neurons[n];
-                    childGenes.InputGene.Neurons[n] = TryMutateNeuron(neuron, random, mutateChance);
-                }
-
-                for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
-                {
-                    if (_config.MutateNumberOfHiddenNeuronsInLayer)
-                    {
-                        childGenes.HiddenGenes[h] = TryAddNeuronsToLayer(childGenes, h, mutateChance, random);
-                    }
-
-                    for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
-                    {
-                        var neuron = childGenes.HiddenGenes[h].Neurons[j];
-                        childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, random, mutateChance);
-                    }
-                }
-                completed.Add(_networkFactory.Create(childGenes));
+                bool mutated;
+                completed.Add(Mutate(net, mutateChance, out mutated));
+                didMutate = didMutate || mutated;
             }
             return completed;
         }
 
-        internal NeuralNetworkGene TryAddLayerToNetwork(NeuralNetworkGene genes, double mutateChance, Random random)
+        internal NeuralNetworkGene TryAddLayerToNetwork(NeuralNetworkGene genes, double mutateChance, out bool didMutate)
         {
             NeuralNetworkGene newGenes = genes;
-            while (random.NextDouble() <= mutateChance)
+            didMutate = false;
+            while (_random.NextDouble() <= mutateChance)
             {
-                int layerToReplace = random.Next(newGenes.HiddenGenes.Count);
-
-                int hiddenLayerSize = DetermineNumberOfHiddenNeuronsInLayer(genes, mutateChance, random);
+                didMutate = true;
+                int layerToReplace = _random.Next(newGenes.HiddenGenes.Count);
+                int hiddenLayerSize = DetermineNumberOfHiddenNeuronsInLayer(genes, mutateChance);
 
                 //update layer-1 axon terminals
                 LayerGene previousLayer = GetPreviousLayerGene(newGenes, layerToReplace);
@@ -94,22 +110,18 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
 
                 for (int i = 0; i < hiddenLayerSize; i++)
                 {
-                    var newNeuron = GetRandomHiddenNeuronGene(newGenes, layerToReplace, random);
+                    var newNeuron = GetRandomHiddenNeuronGene(newGenes, layerToReplace);
                     newGenes.HiddenGenes[layerToReplace].Neurons.Add(newNeuron);
                 }  
             }
             return newGenes;
         }
 
-        internal int DetermineNumberOfHiddenNeuronsInLayer(NeuralNetworkGene networkGenes, double mutateChance, Random random)
+        internal int DetermineNumberOfHiddenNeuronsInLayer(NeuralNetworkGene networkGenes, double mutateChance)
         {
             int hiddenLayerSize = networkGenes.InputGene.Neurons.Count;
-            bool increase = true;
-            if (random.NextDouble() <= 0.5)
-            {
-                increase = false;
-            }
-            while (random.NextDouble() <= mutateChance)
+            bool increase = !(_random.NextDouble() <= 0.5);
+            while (_random.NextDouble() <= mutateChance)
             {
                 if (!increase && hiddenLayerSize == 1)
                 {
@@ -127,11 +139,13 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             return hiddenLayerSize;
         }
 
-        internal LayerGene TryAddNeuronsToLayer(NeuralNetworkGene networkGenes, int hiddenLayerIndex, double mutateChance, Random random)
+        internal LayerGene TryAddNeuronsToLayer(NeuralNetworkGene networkGenes, int hiddenLayerIndex, double mutateChance, out bool didMutate)
         {
             LayerGene hiddenLayer = networkGenes.HiddenGenes[hiddenLayerIndex];
-            while (random.NextDouble() <= mutateChance)
+            didMutate = false;
+            while (_random.NextDouble() <= mutateChance)
             {
+                didMutate = true;
                 //update layer-1 axon terminals
                 LayerGene previousLayer = GetPreviousLayerGene(networkGenes, hiddenLayerIndex);
                 foreach (NeuronGene neuron in previousLayer.Neurons)
@@ -139,13 +153,14 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
                     neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
                 }
 
-                hiddenLayer.Neurons.Add(GetRandomHiddenNeuronGene(networkGenes, hiddenLayerIndex, random));
+                hiddenLayer.Neurons.Add(GetRandomHiddenNeuronGene(networkGenes, hiddenLayerIndex));
             }
             return hiddenLayer;
         }
 
-        internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random, double mutateChance)
+        internal NeuronGene TryMutateNeuron(NeuronGene gene, double mutateChance, out bool didMutate)
         {
+            didMutate = false;
             NeuronGene toReturn = new NeuronGene
             {
                 Axon = new AxonGene
@@ -161,10 +176,11 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             //weights
             for (int j = 0; j < gene.Axon.Weights.Count; j++)
             {
-                if (_config.MutateSynapseWeights && random.NextDouble() <= mutateChance)
+                if (_config.MutateSynapseWeights && _random.NextDouble() <= mutateChance)
                 {
-                    double val = random.NextDouble();
-                    if (random.NextDouble() < 0.5)
+                    didMutate = true;
+                    double val = _random.NextDouble();
+                    if (_random.NextDouble() < 0.5)
                     {
                         // 50% chance of being negative, being between -1 and 1
                         val = 0 - val;
@@ -179,10 +195,11 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
 
 
             //bias
-            if (_config.MutateSomaBiasFunction && random.NextDouble() <= mutateChance)
+            if (_config.MutateSomaBiasFunction && _random.NextDouble() <= mutateChance)
             {
-                double val = random.NextDouble();
-                if (random.NextDouble() < 0.5)
+                didMutate = true;
+                double val = _random.NextDouble();
+                if (_random.NextDouble() < 0.5)
                 {
                     // 50% chance of being negative, being between -1 and 1
                     val = 0 - val;
@@ -195,9 +212,10 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             }
 
             //activation
-            if (_config.MutateAxonActivationFunction && random.NextDouble() <= mutateChance)
+            if (_config.MutateAxonActivationFunction && _random.NextDouble() <= mutateChance)
             {
-                toReturn.Axon.ActivationFunction = GetRandomActivationFunction(random).GetType();
+                didMutate = true;
+                toReturn.Axon.ActivationFunction = GetRandomActivationFunction().GetType();
             }
             else
             {
@@ -205,9 +223,10 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             }
 
             //summation
-            if (_config.MutateSomaSummationFunction && random.NextDouble() <= mutateChance)
+            if (_config.MutateSomaSummationFunction && _random.NextDouble() <= mutateChance)
             {
-                toReturn.Soma.SummationFunction = GetRandomSummationFunction(random).GetType();
+                didMutate = true;
+                toReturn.Soma.SummationFunction = GetRandomSummationFunction().GetType();
             }
             else
             {
@@ -240,19 +259,19 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             }
         }
 
-        internal NeuronGene GetRandomHiddenNeuronGene(NeuralNetworkGene networkGenes, int hiddenLayerIndex, Random random)
+        internal NeuronGene GetRandomHiddenNeuronGene(NeuralNetworkGene networkGenes, int hiddenLayerIndex)
         {
             var neuronGene = new NeuronGene
             {
                 Axon = new AxonGene
                 {
                     Weights = new List<double>(),
-                    ActivationFunction = GetRandomActivationFunction(random).GetType()
+                    ActivationFunction = GetRandomActivationFunction().GetType()
                 },
                 Soma = new SomaGene
                 {
                     Bias = _weightInitializer.InitializeWeight(),
-                    SummationFunction = GetRandomSummationFunction(random).GetType()
+                    SummationFunction = GetRandomSummationFunction().GetType()
                 }
             };
             //update terminals for current neuron
@@ -264,9 +283,9 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             return neuronGene;
         }
 
-        internal IActivationFunction GetRandomActivationFunction(Random random)
+        internal IActivationFunction GetRandomActivationFunction()
         {
-            var value = random.Next(8);
+            var value = _random.Next(8);
             switch (value)
             {
                 case 0:
@@ -289,9 +308,9 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
             }
         }
 
-        internal ISummationFunction GetRandomSummationFunction(Random random)
+        internal ISummationFunction GetRandomSummationFunction()
         {
-            var value = random.Next(4);
+            var value = _random.Next(4);
             switch (value)
             {
                 case 0:
