@@ -147,7 +147,8 @@ namespace NeuralNetwork.GeneticAlgorithm
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
             if (bestPerformer != null)
             {
-                sessions[0] = bestPerformer;
+                sessions[sessions.Count - 1] = bestPerformer;
+                sessions = sessions.OrderBy(s => s.GetSessionEvaluation()).ToList();
             }
 
             _history.AddEval(sessions[0].GetSessionEvaluation());
