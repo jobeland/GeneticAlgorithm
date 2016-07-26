@@ -1,6 +1,8 @@
 ﻿using ArtificialNeuralNetwork;
 using Newtonsoft.Json;
 using System.IO;
+using ArtificialNeuralNetwork.Factories;
+using ArtificialNeuralNetwork.Genes;
 
 namespace NeuralNetwork.GeneticAlgorithm.Utils
 {
@@ -15,8 +17,9 @@ namespace NeuralNetwork.GeneticAlgorithm.Utils
 
         public INeuralNetwork LoadNeuralNetwork(string filename)
         {
-            var jsonNet = File.ReadAllText(_directory + filename);
-            INeuralNetwork network = JsonConvert.DeserializeObject<INeuralNetwork>(jsonNet);
+            var jsonGenes = File.ReadAllText(_directory + filename);
+            var networkGene = JsonConvert.DeserializeObject<NeuralNetworkGene>(jsonGenes);
+            var network = NeuralNetworkFactory.GetInstance().Create(networkGene);
             return network;
         }
     }
