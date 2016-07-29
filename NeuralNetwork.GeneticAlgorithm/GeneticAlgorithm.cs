@@ -76,15 +76,20 @@ namespace NeuralNetwork.GeneticAlgorithm
                     }
                     _generation.Run();
 
-                    var evals = _generation.GetEvalsForGeneration().OrderBy(d => d).ToList();
+                    IEnumerable<double> evals = _generation.GetEvalsForGeneration().OrderByDescending(d => d);
+
+                    if (_evolutionConfig.NumTopEvalsToReport > 0)
+                    {
+                        evals = evals.Take(_evolutionConfig.NumTopEvalsToReport);
+                    }
 
                     var sb = new StringBuilder();
-                    foreach (var t in evals)
+                    foreach (var t in evals.OrderBy(d => d))
                     {
                         sb.AppendLine($"eval: {t}");
                     }
                     LoggerFactory.GetLogger().Log(LogLevel.Info, sb.ToString());
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"count: {evals.Count}");
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"count: {evals.Count()}");
                     LoggerFactory.GetLogger().Log(LogLevel.Info, $"Epoch: {epoch},  Generation: {generation}");
 
                 }
