@@ -25,13 +25,17 @@ namespace NeuralNetwork.GeneticAlgorithm
         public void Run()
         {
             LoggerFactory.GetLogger().Log(LogLevel.Debug, string.Format("Starting training session {0}", _sessionNumber));
-            _evaluatable.RunEvaluation();
+            //only run the session if it hasn't already been run before
+            if (!_hasStoredSessionEval)
+            {
+                _evaluatable.RunEvaluation();
+            }
             LoggerFactory.GetLogger().Log(LogLevel.Debug, string.Format("Stopping training session {0}", _sessionNumber));
         }
 
         public double GetSessionEvaluation()
         {
-           
+
             if (_hasStoredSessionEval)
             {
                 return _sessionEval;
