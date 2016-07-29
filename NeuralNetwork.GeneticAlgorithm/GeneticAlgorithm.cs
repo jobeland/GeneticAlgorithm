@@ -202,7 +202,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             var mutatedTop = GetMutatedNetworks(sessionsToLiveOn.Select(s => s.NeuralNet), mutateChance);
 
             //or each session that lived on that was mutated, remove last top performer, then mutate remaining top performers in batch and add
-            var sessionSubset = sessions.Take(sessions.Count - mutatedTop.Count);
+            var sessionSubset = sessions.Skip(numToLiveOn).Take(sessions.Count - mutatedTop.Count);
             IList <INeuralNetwork> toKeepButPossiblyMutate = sessionSubset.Select(session => session.NeuralNet).ToList();
             IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
 
