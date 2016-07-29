@@ -135,6 +135,37 @@ namespace NeuralNetwork.GeneticAlgorithm
             saver.SaveNeuralNetwork(bestPerformer.NeuralNet, bestPerformer.GetSessionEvaluation(), epoch);
         }
 
+        internal IList<INeuralNetwork> GetMutatedNetworks(IEnumerable<INeuralNetwork> networksToTryToMutate, double mutateChance)
+        {
+            //try to mutate session that will live on 1 by 1
+            var mutatedTop = new List<INeuralNetwork>();
+            bool didMutate;
+            foreach (var topPerformer in networksToTryToMutate)
+            {
+                var net = _mutator.Mutate(topPerformer, mutateChance, out didMutate);
+                if (didMutate)
+                {
+                    mutatedTop.Add(net);
+                }
+            }
+            return mutatedTop;
+        }
+
+        internal double DetermineMutateChance()
+        {
+            var mutateChance = _evolutionConfig.NormalMutationRate;
+            if (_history.IsStale())
+            {
+                mutateChance = _evolutionConfig.HighMutationRate;
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
+            }
+            else
+            {
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
+            }
+            return mutateChance;
+        }
+
         private void createNextGeneration(ITrainingSession bestPerformer)
         {
             Stopwatch watch = new Stopwatch();
@@ -147,47 +178,47 @@ namespace NeuralNetwork.GeneticAlgorithm
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
             if (bestPerformer != null)
             {
+                //TODO: only add best performer if not already in list
                 sessions[sessions.Count - 1] = bestPerformer;
                 sessions = sessions.OrderBy(s => s.GetSessionEvaluation()).ToList();
             }
 
             _history.AddEval(sessions[0].GetSessionEvaluation());
 
-            var mutateChance = _evolutionConfig.NormalMutationRate;
-            if (_history.IsStale())
-            {
-                mutateChance = _evolutionConfig.HighMutationRate;
-                LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
-            }
-            else
-            {
-                LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
-            }
-
+            var mutateChance = DetermineMutateChance();
+            
             IList<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
             var newSessions = new List<ITrainingSession>();
             //Allow the very top numToLiveOn sessions to be added to next generation untouched
             int numToLiveOn = sessions.Count / 10;
-            newSessions.AddRange(sessions.Take(numToLiveOn));
+            var sessionsToLiveOn = sessions.Take(numToLiveOn).ToList();
+            newSessions.AddRange(sessionsToLiveOn);
+
+            //try to mutate session that will live on 1 by 1
+            var mutatedTop = GetMutatedNetworks(sessionsToLiveOn.Select(s => s.NeuralNet), mutateChance);
+
+            //or each session that lived on that was mutated, remove last top performer, then mutate remaining top performers in batch and add
+            var sessionSubset = sessions.Take(sessions.Count - mutatedTop.Count);
+            IList <INeuralNetwork> toKeepButPossiblyMutate = sessionSubset.Select(session => session.NeuralNet).ToList();
             IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
 
             List<INeuralNetwork> toTryMutate = new List<INeuralNetwork>();
-            toTryMutate.AddRange(toKeep);
+            //try to mutate both new networks as well as all the top performers we wanted to keep
+            toTryMutate.AddRange(toKeepButPossiblyMutate);
             toTryMutate.AddRange(newNetworks);
-            IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, mutateChance);
+            bool didMutate;
+            IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, mutateChance, out didMutate);
 
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
+            allToAdd.AddRange(mutatedTop);
             allToAdd.AddRange(children);
             allToAdd.AddRange(maybeMutated);
 
-            for (int net = 0; net < allToAdd.Count; net++)
-            {
-                newSessions.Add(new TrainingSession(allToAdd[net], _evaluatableFactory.Create(allToAdd[net]), net));
-            }
+            newSessions.AddRange(allToAdd.Select((net, sessionNumber) => new TrainingSession(net, _evaluatableFactory.Create(net), sessionNumber)));
             _generation = new Generation(newSessions, _generationConfig);
 
             watch.Stop();
-            LoggerFactory.GetLogger().Log(LogLevel.Debug, string.Format("create generation runtime (sec): {0}", watch.Elapsed.TotalSeconds));
+            LoggerFactory.GetLogger().Log(LogLevel.Debug, $"create generation runtime (sec): {watch.Elapsed.TotalSeconds}");
             watch.Reset();
         }
 
