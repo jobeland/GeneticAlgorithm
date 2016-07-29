@@ -78,12 +78,14 @@ namespace NeuralNetwork.GeneticAlgorithm
 
                     var evals = _generation.GetEvalsForGeneration().OrderBy(d => d).ToList();
 
-                    for (int i = 0; i < evals.Count; i++)
+                    var sb = new StringBuilder();
+                    foreach (var t in evals)
                     {
-                        LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", evals[i]));
+                        sb.AppendLine($"eval: {t}");
                     }
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", evals.Count));
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, sb.ToString());
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"count: {evals.Count}");
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"Epoch: {epoch},  Generation: {generation}");
 
                 }
                 if (_epochAction != null)
