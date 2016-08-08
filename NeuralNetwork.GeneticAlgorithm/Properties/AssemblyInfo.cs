@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("NeuralNetwork.GeneticAlgorithm")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Genetic algorithm for evolving neural networks")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("NeuralNetwork.GeneticAlgorithm")]
