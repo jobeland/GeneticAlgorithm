@@ -210,7 +210,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             sessions = sessions.Skip(numToLiveOn).ToList();
             var sessionSubset = sessions.Take(sessions.Count - mutatedTop.Count);
             IList <INeuralNetwork> toKeepButPossiblyMutate = sessionSubset.Select(session => session.NeuralNet).ToList();
-            IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
+            IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen, mutateChance);
 
             List<INeuralNetwork> toTryMutate = new List<INeuralNetwork>();
             //try to mutate both new networks as well as all the top performers we wanted to keep
@@ -232,15 +232,53 @@ namespace NeuralNetwork.GeneticAlgorithm
             watch.Reset();
         }
 
-        private List<INeuralNetwork> getNewNetworks(int numToGen)
+        private List<INeuralNetwork> getNewNetworks(int numToGen, double mutateChance)
         {
             List<INeuralNetwork> newNets = new List<INeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
-                INeuralNetwork newNet = _networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons);
+                var hiddenSpecs = determineHiddenLayerSpec(_networkConfig.NumInputNeurons,
+                    _networkConfig.NumHiddenLayers, mutateChance);
+                INeuralNetwork newNet = _networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, hiddenSpecs);
                 newNets.Add(newNet);
             }
             return newNets;
         }
+
+        private IList<int> determineHiddenLayerSpec(int defaultNumNeurons, int defaultNumHiddenLayers, double mutateChance)
+        {
+            var random = new Random();
+            var numHiddenLayers = randomizeNumber(defaultNumHiddenLayers, mutateChance, random);
+            var spec = new List<int>();
+            for (var i = 0; i < numHiddenLayers; i++)
+            {
+                var newLayerSize = randomizeNumber(defaultNumNeurons, mutateChance, random);
+                spec.Add(newLayerSize);
+            }
+            return spec;
+        }
+
+        private int randomizeNumber(int seedNumber, double randomizeChance, Random random)
+        {
+            var numToReturn = seedNumber;
+            var increase = !(random.NextDouble() <= 0.5);
+            while (random.NextDouble() <= randomizeChance)
+            {
+                if (!increase && numToReturn == 1)
+                {
+                    break;
+                }
+                if (!increase)
+                {
+                    numToReturn--;
+                }
+                else
+                {
+                    numToReturn++;
+                }
+            }
+            return numToReturn;
+        }
+
     }
 }
