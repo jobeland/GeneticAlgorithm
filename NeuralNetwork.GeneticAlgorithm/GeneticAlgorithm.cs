@@ -33,13 +33,15 @@ namespace NeuralNetwork.GeneticAlgorithm
         private IGeneration _generation;
         private ITrainingSession _bestPerformerOfEpoch;
         private IEpochAction _epochAction;
+        private readonly INeuralNetworkSaver _neuralNetworkSaver;
 
-        private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction)
+        private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction, INeuralNetworkSaver neuralNetworkSaver)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
             _epochAction = epochAction;
+            _neuralNetworkSaver = neuralNetworkSaver;
             var sessions = new List<ITrainingSession>();
             _networkFactory = networkFactory;
             _breeder = breeder;
@@ -54,9 +56,9 @@ namespace NeuralNetwork.GeneticAlgorithm
             _generation = new Generation(sessions, _generationConfig);
         }
 
-        public static IGeneticAlgorithm GetInstance(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction)
+        public static IGeneticAlgorithm GetInstance(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory, IEpochAction epochAction, INeuralNetworkSaver neuralNetworkSaver)
         {
-            return new GeneticAlgorithm(networkConfig, generationConfig, evolutionConfig, networkFactory, breeder, mutator, workingSet, evaluatableFactory, epochAction);
+            return new GeneticAlgorithm(networkConfig, generationConfig, evolutionConfig, networkFactory, breeder, mutator, workingSet, evaluatableFactory, epochAction, neuralNetworkSaver);
         }
 
         public void RunSimulation()
@@ -138,8 +140,7 @@ namespace NeuralNetwork.GeneticAlgorithm
         internal void SaveBestPerformer(int epoch)
         {
             ITrainingSession bestPerformer = _generation.GetBestPerformer();
-            var saver = new NeuralNetworkSaver("\\networks");
-            saver.SaveNeuralNetwork(bestPerformer.NeuralNet, bestPerformer.GetSessionEvaluation(), epoch);
+            _neuralNetworkSaver.SaveNeuralNetwork(bestPerformer.NeuralNet, bestPerformer.GetSessionEvaluation(), epoch);
         }
 
         internal IList<INeuralNetwork> GetMutatedNetworks(IEnumerable<INeuralNetwork> networksToTryToMutate, double mutateChance)
