@@ -22,8 +22,10 @@ namespace NeuralNetwork.GeneticAlgorithm.Utils
             var genes = network.GetGenes();
             var json = JsonConvert.SerializeObject(genes);
             var minimized = MinifyJson(json);
-            var filename = string.Format("\\network_eval_{0}_epoch_{1}_date_{2}.json", networkEvaluation, epoch, DateTime.Now.Ticks);
-            File.WriteAllText(_directory + filename, minimized);
+            var filename = string.Format("network_eval_{0}_epoch_{1}_date_{2}.json", networkEvaluation, epoch, DateTime.Now.Ticks);
+            if (!Directory.Exists(_directory))
+                Directory.CreateDirectory(_directory);
+            File.WriteAllText(Path.Combine(_directory, filename), minimized);
             return filename;
         }
 
