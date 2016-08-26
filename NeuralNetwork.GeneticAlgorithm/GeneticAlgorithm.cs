@@ -181,6 +181,11 @@ namespace NeuralNetwork.GeneticAlgorithm
             int numberOfTopPerformersToChoose = (int)(_generationConfig.GenerationPopulation * 0.50);
             int numToBreed = (int)(_generationConfig.GenerationPopulation * 0.35);
             int numToGen = (int)(_generationConfig.GenerationPopulation * 0.15);
+            if (numberOfTopPerformersToChoose + numToBreed + numToGen < _generationConfig.GenerationPopulation)
+            {
+                numToGen += _generationConfig.GenerationPopulation -
+                            (numberOfTopPerformersToChoose + numToBreed + numToGen);
+            }
 
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
             if (bestPerformer != null)
