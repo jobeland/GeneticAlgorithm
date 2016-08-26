@@ -77,7 +77,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                     _generation.Run();
 
                     IEnumerable<double> evals = _generation.GetEvalsForGeneration().OrderByDescending(d => d);
-
+                    var evalsTotalCount = evals.Count();
                     if (_evolutionConfig.NumTopEvalsToReport > 0)
                     {
                         evals = evals.Take(_evolutionConfig.NumTopEvalsToReport);
@@ -89,7 +89,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                         sb.AppendLine($"eval: {t}");
                     }
                     LoggerFactory.GetLogger().Log(LogLevel.Info, sb.ToString());
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"count: {evals.Count()}");
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"count: {evalsTotalCount}");
                     LoggerFactory.GetLogger().Log(LogLevel.Info, $"Epoch: {epoch},  Generation: {generation}");
 
                 }
