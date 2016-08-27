@@ -68,6 +68,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                 {
                     if (generation == 0)
                     {
+                        LoggerFactory.GetLogger().Log(LogLevel.Info, $"Creating next generation with top performer with eval: {_bestPerformerOfEpoch.GetSessionEvaluation()}");
                         createNextGeneration(_bestPerformerOfEpoch);
                     }
                     else
@@ -95,6 +96,7 @@ namespace NeuralNetwork.GeneticAlgorithm
                 }
                 if (_epochAction != null)
                 {
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, "Updating best performer");
                     _bestPerformerOfEpoch = _epochAction.UpdateBestPerformer(_generation, epoch);
                 }
                 else
@@ -109,6 +111,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             _generation.Run();
             if (_epochAction != null)
             {
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Getting best performer");
                 _bestPerformerOfEpoch = _epochAction.UpdateBestPerformer(_generation, 0);
             }
             else
@@ -190,11 +193,18 @@ namespace NeuralNetwork.GeneticAlgorithm
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
             if (bestPerformer != null)
             {
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Best performer found for creaitng generation");
                 if (sessions.All(s => s.NeuralNet.GetGenes() != bestPerformer.NeuralNet.GetGenes()))
                 {
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"Best performer adding to sessions with eval {bestPerformer.GetSessionEvaluation()}");
                     sessions[sessions.Count - 1] = bestPerformer;
-                    sessions = sessions.OrderBy(s => s.GetSessionEvaluation()).ToList();
+                    sessions = sessions.OrderByDescending(s => s.GetSessionEvaluation()).ToList();
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"session 0 eval: {sessions[0].GetSessionEvaluation()}");
                 }
+            }
+            else
+            {
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "No Best performer found when creating next generation");
             }
 
             _history.AddEval(sessions[0].GetSessionEvaluation());
