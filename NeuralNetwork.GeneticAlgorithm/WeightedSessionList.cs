@@ -41,8 +41,8 @@ namespace NeuralNetwork.GeneticAlgorithm
             toChooseFrom = toChooseFrom.OrderBy(session => session.Weight).ToList();
             foreach (WeightedSession session in toChooseFrom)
             {
-                session.CumlativeWeight = cumulative;
                 cumulative += session.Weight;
+                session.CumlativeWeight = cumulative;
             }
             _sessions = toChooseFrom;
         }
