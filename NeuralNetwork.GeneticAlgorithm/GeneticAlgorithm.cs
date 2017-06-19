@@ -196,10 +196,19 @@ namespace NeuralNetwork.GeneticAlgorithm
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Best performer found for creaitng generation");
                 if (sessions.All(s => s.NeuralNet.GetGenes() != bestPerformer.NeuralNet.GetGenes()))
                 {
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"Best performer adding to sessions with eval {bestPerformer.GetSessionEvaluation()}");
+                    LoggerFactory.GetLogger()
+                        .Log(LogLevel.Info,
+                            $"Best performer adding to sessions with eval {bestPerformer.GetSessionEvaluation()}");
                     sessions[sessions.Count - 1] = bestPerformer;
                     sessions = sessions.OrderByDescending(s => s.GetSessionEvaluation()).ToList();
-                    LoggerFactory.GetLogger().Log(LogLevel.Info, $"session 0 eval: {sessions[0].GetSessionEvaluation()}");
+                    LoggerFactory.GetLogger()
+                        .Log(LogLevel.Info, $"session 0 eval: {sessions[0].GetSessionEvaluation()}");
+                }
+                else
+                {
+                    LoggerFactory.GetLogger()
+                        .Log(LogLevel.Info,
+                            $"Best performer already in generation: not adding.");
                 }
             }
             else
