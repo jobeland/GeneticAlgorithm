@@ -285,7 +285,7 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
 
         internal IActivationFunction GetRandomActivationFunction()
         {
-            var value = _random.Next(8);
+            var value = _random.Next(10);
             switch (value)
             {
                 case 0:
@@ -303,6 +303,10 @@ namespace NeuralNetwork.GeneticAlgorithm.Evolution
                 case 6:
                     return new IdentityActivationFunction();
                 case 7:
+                    return new RectifiedLinearActivationFunction();
+                case 8:
+                    return new LeakyRectifiedLinearActivationFunction();
+                case 9:
                 default:
                     return new SigmoidActivationFunction();
             }

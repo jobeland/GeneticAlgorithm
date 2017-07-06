@@ -39,8 +39,8 @@
       <HintPath>..\packages\JoBeland.Logging.1.0.0.0\lib\net45\Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NeuralNetwork, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NeuralNetwork.4.0.0\lib\net451\NeuralNetwork.dll</HintPath>
+    <Reference Include="NeuralNetwork, Version=7.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NeuralNetwork.7.4.0\lib\net451\NeuralNetwork.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -93,7 +93,9 @@
     <Compile Include="WeightedSessionList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

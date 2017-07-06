@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Logging;
 using NeuralNetwork.GeneticAlgorithm.Utils;
 
 namespace NeuralNetwork.GeneticAlgorithm
@@ -49,13 +50,9 @@ namespace NeuralNetwork.GeneticAlgorithm
 
         public ITrainingSession ChooseRandomWeightedSession()
         {
-            double value = RandomGenerator.GetInstance().NextDouble() * _sessions[_sessions.Count - 1].CumlativeWeight;
-            //Failsafe for odd case when value is very low. Needs a more permanent fix so as not to skew the selection towards lower, however slight           
-            if (_sessions[0].CumlativeWeight > value)
-            {
-                return _sessions[0].Session;
-            }
-            return _sessions.Last(session => session.CumlativeWeight <= value).Session;
+            var value = RandomGenerator.GetInstance().NextDouble() * _sessions[_sessions.Count - 1].CumlativeWeight;
+            var weightedSession = _sessions.LastOrDefault(s => s.CumlativeWeight <= value);
+            return weightedSession == null ? _sessions[0].Session : weightedSession.Session;
         }
     }
 }

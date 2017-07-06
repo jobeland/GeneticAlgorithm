@@ -193,7 +193,7 @@ namespace NeuralNetwork.GeneticAlgorithm
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
             if (bestPerformer != null)
             {
-                LoggerFactory.GetLogger().Log(LogLevel.Info, "Best performer found for creaitng generation");
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Best performer found for creating generation");
                 if (sessions.All(s => s.NeuralNet.GetGenes() != bestPerformer.NeuralNet.GetGenes()))
                 {
                     LoggerFactory.GetLogger()
@@ -210,10 +210,6 @@ namespace NeuralNetwork.GeneticAlgorithm
                         .Log(LogLevel.Info,
                             $"Best performer already in generation: not adding.");
                 }
-            }
-            else
-            {
-                LoggerFactory.GetLogger().Log(LogLevel.Info, "No Best performer found when creating next generation");
             }
 
             _history.AddEval(sessions[0].GetSessionEvaluation());
