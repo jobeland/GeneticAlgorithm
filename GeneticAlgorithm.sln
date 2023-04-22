@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork.GeneticAlgorithm", "NeuralNetwork.GeneticAlgorithm\NeuralNetwork.GeneticAlgorithm.csproj", "{66F387F7-5DD8-4495-B5EB-3F480B34015B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{901D76A3-035C-4CBC-ABAD-E5648FABB221}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticAlgorithm.Core", "source\GeneticAlgorithm.Core\GeneticAlgorithm.Core.csproj", "{F9DDF261-58BF-451F-840E-21748AFC06DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Core", "..\NeuralNetwork\source\NeuralNetwork.Core\NeuralNetwork.Core.csproj", "{71FD5AAC-E2F2-4D21-95FB-575867D94198}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +15,23 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{66F387F7-5DD8-4495-B5EB-3F480B34015B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66F387F7-5DD8-4495-B5EB-3F480B34015B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66F387F7-5DD8-4495-B5EB-3F480B34015B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66F387F7-5DD8-4495-B5EB-3F480B34015B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F9DDF261-58BF-451F-840E-21748AFC06DD} = {901D76A3-035C-4CBC-ABAD-E5648FABB221}
+		{71FD5AAC-E2F2-4D21-95FB-575867D94198} = {901D76A3-035C-4CBC-ABAD-E5648FABB221}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7AF2AFEA-E09F-4FB8-B80C-C375AAEF56DB}
 	EndGlobalSection
 EndGlobal
