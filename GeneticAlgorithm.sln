@@ -5,9 +5,15 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{901D76A3-035C-4CBC-ABAD-E5648FABB221}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticAlgorithm.Core", "source\GeneticAlgorithm.Core\GeneticAlgorithm.Core.csproj", "{F9DDF261-58BF-451F-840E-21748AFC06DD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A2C12031-5E94-44E6-87A5-1A700C9A990B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Core", "..\NeuralNetwork\source\NeuralNetwork.Core\NeuralNetwork.Core.csproj", "{71FD5AAC-E2F2-4D21-95FB-575867D94198}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworks.Core", "..\NeuralNetwork\source\NeuralNetworks.Core\NeuralNetworks.Core.csproj", "{B71EE943-400E-494B-87E6-6FD722C00642}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworks.Core.Tests", "..\NeuralNetwork\tests\NeuralNetworks.Core.Tests\NeuralNetworks.Core.Tests.csproj", "{3C7737B6-8A49-44FD-9D4E-CD4E3177DBE8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneticAlgorithms.Core", "source\GeneticAlgorithms.Core\GeneticAlgorithms.Core.csproj", "{67CCCDA0-37AE-41A5-9007-E325BB3007A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneticAlgorithms.Core.Tests", "tests\GeneticAlgorithms.Core.Tests\GeneticAlgorithms.Core.Tests.csproj", "{B8BC9259-273E-4920-A2DF-3DBF2444039E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,21 +21,31 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F9DDF261-58BF-451F-840E-21748AFC06DD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71FD5AAC-E2F2-4D21-95FB-575867D94198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B71EE943-400E-494B-87E6-6FD722C00642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B71EE943-400E-494B-87E6-6FD722C00642}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B71EE943-400E-494B-87E6-6FD722C00642}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B71EE943-400E-494B-87E6-6FD722C00642}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C7737B6-8A49-44FD-9D4E-CD4E3177DBE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C7737B6-8A49-44FD-9D4E-CD4E3177DBE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C7737B6-8A49-44FD-9D4E-CD4E3177DBE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C7737B6-8A49-44FD-9D4E-CD4E3177DBE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67CCCDA0-37AE-41A5-9007-E325BB3007A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67CCCDA0-37AE-41A5-9007-E325BB3007A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67CCCDA0-37AE-41A5-9007-E325BB3007A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67CCCDA0-37AE-41A5-9007-E325BB3007A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8BC9259-273E-4920-A2DF-3DBF2444039E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8BC9259-273E-4920-A2DF-3DBF2444039E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8BC9259-273E-4920-A2DF-3DBF2444039E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8BC9259-273E-4920-A2DF-3DBF2444039E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{F9DDF261-58BF-451F-840E-21748AFC06DD} = {901D76A3-035C-4CBC-ABAD-E5648FABB221}
-		{71FD5AAC-E2F2-4D21-95FB-575867D94198} = {901D76A3-035C-4CBC-ABAD-E5648FABB221}
+		{B71EE943-400E-494B-87E6-6FD722C00642} = {901D76A3-035C-4CBC-ABAD-E5648FABB221}
+		{3C7737B6-8A49-44FD-9D4E-CD4E3177DBE8} = {A2C12031-5E94-44E6-87A5-1A700C9A990B}
+		{67CCCDA0-37AE-41A5-9007-E325BB3007A9} = {901D76A3-035C-4CBC-ABAD-E5648FABB221}
+		{B8BC9259-273E-4920-A2DF-3DBF2444039E} = {A2C12031-5E94-44E6-87A5-1A700C9A990B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7AF2AFEA-E09F-4FB8-B80C-C375AAEF56DB}
