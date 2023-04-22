@@ -63,7 +63,7 @@ public class Mutator : IMutator
 
     public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance, out bool didMutate)
     {
-        List<INeuralNetwork> completed = new List<INeuralNetwork>();
+        List<INeuralNetwork> completed = new();
         didMutate = false;
         foreach (INeuralNetwork net in networks)
         {
@@ -169,7 +169,7 @@ public class Mutator : IMutator
         LayerGene nextlayer = GetNextLayerGene(networkGenes, hiddenLayerIndex);
         for (int i = 0; i < nextlayer.Neurons.Count; i++)
         {
-            neuronGene.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+            neuronGene.Axon?.Weights.Add(_weightInitializer.InitializeWeight());
         }
         return neuronGene;
     }
@@ -212,14 +212,14 @@ public class Mutator : IMutator
 
             foreach (NeuronGene neuron in previousLayer.Neurons)
             {
-                neuron.Axon.Weights.Clear();
+                neuron.Axon?.Weights.Clear();
                 for (int i = 0; i < hiddenLayerSize; i++)
                 {
-                    neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                    neuron.Axon?.Weights.Add(_weightInitializer.InitializeWeight());
                 }
             }
 
-            LayerGene newLayer = new LayerGene(new List<NeuronGene>());
+            LayerGene newLayer = new(new List<NeuronGene>());
 
             newGenes.HiddenGenes.Insert(layerToReplace, newLayer);
 
@@ -244,7 +244,7 @@ public class Mutator : IMutator
             LayerGene previousLayer = GetPreviousLayerGene(networkGenes, hiddenLayerIndex);
             foreach (NeuronGene neuron in previousLayer.Neurons)
             {
-                neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                neuron.Axon?.Weights.Add(_weightInitializer.InitializeWeight());
             }
 
             hiddenLayer.Neurons.Add(GetRandomHiddenNeuronGene(networkGenes, hiddenLayerIndex));
@@ -256,14 +256,14 @@ public class Mutator : IMutator
     {
         didMutate = false;
 
-        AxonGene axon = new(gene.Axon.ActivationFunction, new List<double>());
+        AxonGene axon = new(gene.Axon?.ActivationFunction, new List<double>());
 
-        SomaGene soma = new(0, gene.Soma.SummationFunction);
+        SomaGene soma = new(0, gene.Soma?.SummationFunction);
 
         NeuronGene toReturn = new(soma, axon);
 
         //weights
-        for (int j = 0; j < gene.Axon.Weights.Count; j++)
+        for (int j = 0; j < gene.Axon?.Weights.Count; j++)
         {
             if (_config.MutateSynapseWeights && _random.NextDouble() <= mutateChance)
             {
@@ -274,11 +274,11 @@ public class Mutator : IMutator
                     // 50% chance of being negative, being between -1 and 1
                     val = 0 - val;
                 }
-                toReturn.Axon.Weights.Add(val);
+                toReturn.Axon?.Weights.Add(val);
             }
             else
             {
-                toReturn.Axon.Weights.Add(gene.Axon.Weights[j]);
+                toReturn.Axon?.Weights.Add(gene.Axon.Weights[j]);
             }
         }
 
@@ -292,22 +292,22 @@ public class Mutator : IMutator
                 // 50% chance of being negative, being between -1 and 1
                 val = 0 - val;
             }
-            toReturn.Soma.Bias = val;
+            toReturn.Soma!.Bias = val;
         }
         else
         {
-            toReturn.Soma.Bias = gene.Soma.Bias;
+            toReturn.Soma!.Bias = gene.Soma?.Bias ?? 0d;
         }
 
         //activation
         if (_config.MutateAxonActivationFunction && _random.NextDouble() <= mutateChance)
         {
             didMutate = true;
-            toReturn.Axon.ActivationFunction = GetRandomActivationFunction().GetType();
+            toReturn.Axon!.ActivationFunction = GetRandomActivationFunction().GetType();
         }
         else
         {
-            toReturn.Axon.ActivationFunction = gene.Axon.ActivationFunction;
+            toReturn.Axon!.ActivationFunction = gene.Axon?.ActivationFunction;
         }
 
         //summation
@@ -318,7 +318,7 @@ public class Mutator : IMutator
         }
         else
         {
-            toReturn.Soma.SummationFunction = gene.Soma.SummationFunction;
+            toReturn.Soma.SummationFunction = gene.Soma?.SummationFunction;
         }
         return gene;
     }

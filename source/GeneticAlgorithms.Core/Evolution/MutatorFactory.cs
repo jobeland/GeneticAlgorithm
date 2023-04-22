@@ -26,7 +26,7 @@ public class MutatorFactory : IMutatorFactory
 
     public IMutator Create()
     {
-        MutationConfigurationSettings config = new MutationConfigurationSettings
+        MutationConfigurationSettings config = new()
         {
             MutateAxonActivationFunction = true,
             MutateNumberOfHiddenLayers = true,

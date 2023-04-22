@@ -24,8 +24,8 @@ public class Breeder : IBreeder
 
     public IList<INeuralNetwork> Breed(IList<ITrainingSession> sessions, int numToBreed)
     {
-        WeightedSessionList weightedSessions = new WeightedSessionList(sessions);
-        List<INeuralNetwork> children = new List<INeuralNetwork>();
+        WeightedSessionList weightedSessions = new(sessions);
+        List<INeuralNetwork> children = new();
         for (int bred = 0; bred < numToBreed; bred++)
         {
             // choose mother
@@ -45,18 +45,18 @@ public class Breeder : IBreeder
 
     internal NeuronGene AdjustAxonTerminalsOfNeuronGene(NeuronGene gene, int desiredNumberOfTerminals)
     {
-        NeuronGene toReturn = new NeuronGene
+        NeuronGene toReturn = new()
         {
             Axon = new AxonGene(),
             Soma = new SomaGene()
         };
 
-        toReturn.Axon.ActivationFunction = gene.Axon.ActivationFunction;
+        toReturn.Axon.ActivationFunction = gene.Axon?.ActivationFunction;
         toReturn.Axon.Weights = new List<double>();
-        toReturn.Soma.SummationFunction = gene.Soma.SummationFunction;
-        toReturn.Soma.Bias = gene.Soma.Bias;
+        toReturn.Soma.SummationFunction = gene.Soma?.SummationFunction;
+        toReturn.Soma.Bias = gene.Soma?.Bias ?? 0d;
 
-        if (desiredNumberOfTerminals > gene.Axon.Weights.Count)
+        if (desiredNumberOfTerminals > gene.Axon?.Weights.Count)
         {
             for (int i = 0; i < gene.Axon.Weights.Count; i++)
             {
@@ -72,7 +72,7 @@ public class Breeder : IBreeder
         {
             for (int i = 0; i < desiredNumberOfTerminals; i++)
             {
-                toReturn.Axon.Weights.Add(gene.Axon.Weights[i]);
+                toReturn.Axon.Weights.Add(gene.Axon?.Weights[i] ?? throw new NullReferenceException());
             }
         }
 
@@ -130,7 +130,7 @@ public class Breeder : IBreeder
     {
         NeuralNetworkGene motherGenes = mother.GetGenes();
         NeuralNetworkGene childFatherGenes = father.GetGenes();
-        Random random = new Random();
+        Random random = new();
 
         for (int n = 0; n < childFatherGenes.InputGene.Neurons.Count; n++)
         {
@@ -163,7 +163,7 @@ public class Breeder : IBreeder
 
     internal IList<double> MateAxonWeights(NeuronGene moreTerminals, NeuronGene lessTerminals, Random random)
     {
-        List<double> weights = new List<double>();
+        List<double> weights = new();
         for (int j = 0; j < moreTerminals.Axon?.Weights.Count; j++)
         {
             if (random.NextDouble() < _motherFatherBias && j < lessTerminals.Axon?.Weights.Count)
@@ -180,7 +180,7 @@ public class Breeder : IBreeder
 
     internal IList<LayerGene> MateHiddenLayers(IList<LayerGene> moreLayers, IList<LayerGene> lessLayers, Random random)
     {
-        List<LayerGene> matedLayers = new List<LayerGene>();
+        List<LayerGene> matedLayers = new();
         for (int h = 0; h < moreLayers.Count; h++)
         {
             //check to make sure they both have that hidden layer and only breed that layer if they both do. otherwise just keep it untouched
@@ -207,8 +207,8 @@ public class Breeder : IBreeder
     {
         LayerGene childGene = new(new List<NeuronGene>());
 
-        bool sameNumberOfTerminalsPerNeuronForBothMates = moreNeurons.Neurons[0].Axon.Weights.Count == lessNeurons.Neurons[0].Axon.Weights.Count;
-        int maxTerminals = Math.Max(moreNeurons.Neurons[0].Axon.Weights.Count, lessNeurons.Neurons[0].Axon.Weights.Count);
+        bool sameNumberOfTerminalsPerNeuronForBothMates = moreNeurons.Neurons[0].Axon?.Weights.Count == lessNeurons.Neurons[0].Axon?.Weights.Count;
+        int maxTerminals = Math.Max(moreNeurons.Neurons[0].Axon?.Weights.Count ?? throw new NullReferenceException(), lessNeurons.Neurons[0].Axon?.Weights.Count ?? throw new NullReferenceException());
 
         for (int j = 0; j < moreNeurons.Neurons.Count; j++)
         {

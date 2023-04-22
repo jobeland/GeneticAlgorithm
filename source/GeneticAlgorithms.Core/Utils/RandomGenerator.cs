@@ -2,19 +2,19 @@
 
 public class RandomGenerator
 {
-    private static readonly object padlock = new object();
+    private static readonly object padlock = new();
 
-    private static Random random;
+    private static Random? _random;
 
     public static Random GetInstance()
     {
         lock (padlock)
         {
-            if (random == null)
+            if (_random == null)
             {
-                random = new Random();
+                _random = new Random();
             }
         }
-        return random; ;
+        return _random; ;
     }
 }

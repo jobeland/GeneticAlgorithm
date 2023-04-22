@@ -29,7 +29,7 @@ namespace GeneticAlgorithms.Core.Tests
 
             IEvaluatableFactory evaluatableFactory = mock.Object;
 
-            NeuralNetworkConfigurationSettings networkConfig = new NeuralNetworkConfigurationSettings
+            NeuralNetworkConfigurationSettings networkConfig = new()
             {
                 NumInputNeurons = 3,
                 NumOutputNeurons = 1,

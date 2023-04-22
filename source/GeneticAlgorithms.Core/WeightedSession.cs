@@ -2,7 +2,7 @@
 
 public class WeightedSession
 {
-    public double CumlativeWeight;
-    public ITrainingSession Session;
-    public double Weight;
+    public double CumlativeWeight { get; set; }
+    public ITrainingSession? Session { get; set; }
+    public double Weight { get; set; }
 }

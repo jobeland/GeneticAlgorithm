@@ -18,14 +18,14 @@ public class WeightedSessionList
             sumOfAllEvals = 1;
         }
 
-        List<WeightedSession> toChooseFrom = new List<WeightedSession>();
+        List<WeightedSession> toChooseFrom = new();
         double cumulative = 0.0;
         for (int i = 0; i < sessions.Count; i++)
         {
             //TODO: this weight determination algorithm should be delegated
             double value = sessions[i].GetSessionEvaluation();
             double weight = value / sumOfAllEvals;
-            WeightedSession weightedSession = new WeightedSession
+            WeightedSession weightedSession = new()
             {
                 Session = sessions[i],
                 Weight = weight,
@@ -46,6 +46,6 @@ public class WeightedSessionList
     {
         double value = RandomGenerator.GetInstance().NextDouble() * _sessions[_sessions.Count - 1].CumlativeWeight;
         WeightedSession? weightedSession = _sessions.LastOrDefault(s => s.CumlativeWeight <= value);
-        return weightedSession == null ? _sessions[0].Session : weightedSession.Session;
+        return weightedSession is null ? _sessions[0].Session! : weightedSession.Session!;
     }
 }

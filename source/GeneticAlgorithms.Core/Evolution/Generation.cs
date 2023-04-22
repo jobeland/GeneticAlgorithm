@@ -4,9 +4,8 @@ public class Generation : IGeneration
 {
     private readonly GenerationConfigurationSettings _generationConfig;
 
+    private double[]? _evals;
     private IList<ITrainingSession> _sessions;
-
-    private double[] _evals { get; set; }
 
     public Generation(IList<ITrainingSession> population, GenerationConfigurationSettings generationConfig)
     {
@@ -66,7 +65,7 @@ public class Generation : IGeneration
             }
         }
 
-        List<ITrainingSession> sessionsToReturn = new List<ITrainingSession>();
+        List<ITrainingSession> sessionsToReturn = new();
         for (int i = 0; i < numPerformers; i++)
         {
             sessionsToReturn.Add(_sessions[indicesToKeep[i]]);

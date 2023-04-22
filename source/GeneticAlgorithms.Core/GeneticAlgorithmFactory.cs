@@ -32,7 +32,7 @@ public class GeneticAlgorithmFactory : IGeneticAlgorithmFactory
     {
         NeuralNetworkFactory networkFactory = NeuralNetworkFactory.GetInstance();
         IEvalWorkingSetFactory workingSetFactory = EvalWorkingSetFactory.GetInstance();
-        Random random = new Random();
+        Random random = new();
         IBreederFactory breederFactory = BreederFactory.GetInstance(networkFactory, new RandomWeightInitializer(random));
         IMutatorFactory mutatorFactory = MutatorFactory.GetInstance(networkFactory, new RandomWeightInitializer(random));
         return new GeneticAlgorithmFactory(networkFactory, workingSetFactory, evaluatableFactory, breederFactory, mutatorFactory);
@@ -56,12 +56,12 @@ public class GeneticAlgorithmFactory : IGeneticAlgorithmFactory
         IBreeder breeder = _breederFactory.Create();
         IMutator mutator = _mutatorFactory.Create();
         IEvalWorkingSet workingSet = _workingSetFactory.Create();
-        GenerationConfigurationSettings generationConfig = new GenerationConfigurationSettings
+        GenerationConfigurationSettings generationConfig = new()
         {
             GenerationPopulation = 100,
             UseMultithreading = true
         };
-        EvolutionConfigurationSettings evolutionConfig = new EvolutionConfigurationSettings
+        EvolutionConfigurationSettings evolutionConfig = new()
         {
             GenerationsPerEpoch = 100,
             HighMutationRate = 0.5,

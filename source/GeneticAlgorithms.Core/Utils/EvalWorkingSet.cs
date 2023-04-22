@@ -28,7 +28,7 @@ public class EvalWorkingSet : IEvalWorkingSet
 
     public bool IsStale()
     {
-        if (_pastEvals.First.Value <= _pastEvals.Last.Value)
+        if (_pastEvals.First?.Value <= _pastEvals.Last?.Value)
         {
             return true;
         }
