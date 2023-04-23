@@ -12,7 +12,7 @@ public class GeneticAlgorithmFactory : IGeneticAlgorithmFactory
     private readonly IEvaluatableFactory _evaluatableFactory;
     private readonly IMutatorFactory _mutatorFactory;
     private readonly IEvalWorkingSetFactory _workingSetFactory;
-    private INeuralNetworkFactory _networkFactory;
+    private readonly INeuralNetworkFactory _networkFactory;
 
     private GeneticAlgorithmFactory(INeuralNetworkFactory networkFactory, IEvalWorkingSetFactory workingSetFactory, IEvaluatableFactory evaluatableFactory, IBreederFactory breederFactory, IMutatorFactory mutatorFactory)
     {

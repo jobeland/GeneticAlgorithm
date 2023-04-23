@@ -4,7 +4,7 @@ namespace GeneticAlgorithms.Core;
 
 public class WeightedSessionList
 {
-    private IList<WeightedSession> _sessions;
+    private readonly IList<WeightedSession> _sessions;
 
     public WeightedSessionList(IList<ITrainingSession> sessions)
     {

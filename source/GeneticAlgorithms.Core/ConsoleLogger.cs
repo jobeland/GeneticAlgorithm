@@ -4,13 +4,13 @@ namespace GeneticAlgorithms.Core;
 
 public static class ConsoleLogger
 {
-    private static Lazy<ILoggerFactory> _lazyLoggerFactory = new(() => ConfigureLoggerFactory());
+    private static readonly Lazy<ILoggerFactory> _lazyLoggerFactory = new(() => ConfigureLoggerFactory());
 
-    private static ILoggerFactory _loggerFactory => _lazyLoggerFactory.Value;
+    public static ILoggerFactory LoggerFactory => _lazyLoggerFactory.Value;
 
     public static ILoggerFactory ConfigureLoggerFactory()
     {
-        ILoggerFactory factory = LoggerFactory.Create(builder =>
+        ILoggerFactory factory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
         });
@@ -20,11 +20,11 @@ public static class ConsoleLogger
 
     public static ILogger GetLogger(string categoryName)
     {
-        return _loggerFactory.CreateLogger(categoryName);
+        return LoggerFactory.CreateLogger(categoryName);
     }
 
     public static ILogger<T> GetLogger<T>()
     {
-        return _loggerFactory.CreateLogger<T>();
+        return LoggerFactory.CreateLogger<T>();
     }
 }

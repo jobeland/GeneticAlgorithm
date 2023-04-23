@@ -2,8 +2,8 @@
 
 public class EvalWorkingSet : IEvalWorkingSet
 {
-    private LinkedList<Double> _pastEvals;
-    private int _size;
+    private readonly LinkedList<Double> _pastEvals;
+    private readonly int _size;
 
     private EvalWorkingSet(int size)
     {

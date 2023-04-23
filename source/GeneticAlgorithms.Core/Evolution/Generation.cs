@@ -4,8 +4,8 @@ public class Generation : IGeneration
 {
     private readonly GenerationConfigurationSettings _generationConfig;
 
+    private readonly IList<ITrainingSession> _sessions;
     private double[]? _evals;
-    private IList<ITrainingSession> _sessions;
 
     public Generation(IList<ITrainingSession> population, GenerationConfigurationSettings generationConfig)
     {
@@ -56,9 +56,7 @@ public class Generation : IGeneration
                     // need to shift all of the rest down now
                     for (int indexContinued = i; indexContinued < numPerformers; indexContinued++)
                     {
-                        int oldIndex = indicesToKeep[indexContinued];
-                        indicesToKeep[indexContinued] = newIndex;
-                        newIndex = oldIndex;
+                        (newIndex, indicesToKeep[indexContinued]) = (indicesToKeep[indexContinued], newIndex);
                     }
                     break;
                 }

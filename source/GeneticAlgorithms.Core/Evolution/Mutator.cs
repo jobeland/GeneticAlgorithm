@@ -67,11 +67,34 @@ public class Mutator : IMutator
         didMutate = false;
         foreach (INeuralNetwork net in networks)
         {
-            bool mutated;
-            completed.Add(Mutate(net, mutateChance, out mutated));
+            completed.Add(Mutate(net, mutateChance, out bool mutated));
             didMutate = didMutate || mutated;
         }
         return completed;
+    }
+
+    internal static LayerGene GetNextLayerGene(NeuralNetworkGene genes, int hiddenLayerIndex)
+    {
+        if (hiddenLayerIndex == genes.HiddenGenes.Count - 1)
+        {
+            return genes.OutputGene;
+        }
+        else
+        {
+            return genes.HiddenGenes[hiddenLayerIndex + 1];
+        }
+    }
+
+    internal static LayerGene GetPreviousLayerGene(NeuralNetworkGene genes, int hiddenLayerIndex)
+    {
+        if (hiddenLayerIndex == 0)
+        {
+            return genes.InputGene;
+        }
+        else
+        {
+            return genes.HiddenGenes[hiddenLayerIndex - 1];
+        }
     }
 
     internal int DetermineNumberOfHiddenNeuronsInLayer(NeuralNetworkGene networkGenes, double mutateChance)
@@ -96,66 +119,22 @@ public class Mutator : IMutator
         return hiddenLayerSize;
     }
 
-    internal LayerGene GetNextLayerGene(NeuralNetworkGene genes, int hiddenLayerIndex)
-    {
-        if (hiddenLayerIndex == genes.HiddenGenes.Count - 1)
-        {
-            return genes.OutputGene;
-        }
-        else
-        {
-            return genes.HiddenGenes[hiddenLayerIndex + 1];
-        }
-    }
-
-    internal LayerGene GetPreviousLayerGene(NeuralNetworkGene genes, int hiddenLayerIndex)
-    {
-        if (hiddenLayerIndex == 0)
-        {
-            return genes.InputGene;
-        }
-        else
-        {
-            return genes.HiddenGenes[hiddenLayerIndex - 1];
-        }
-    }
-
     internal IActivationFunction GetRandomActivationFunction()
     {
         int value = _random.Next(10);
-        switch (value)
+        return value switch
         {
-            case 0:
-                return new TanhActivationFunction();
-
-            case 1:
-                return new StepActivationFunction();
-
-            case 2:
-                return new SinhActivationFunction();
-
-            case 3:
-                return new AbsoluteXActivationFunction();
-
-            case 4:
-                return new SechActivationFunction();
-
-            case 5:
-                return new InverseActivationFunction();
-
-            case 6:
-                return new IdentityActivationFunction();
-
-            case 7:
-                return new RectifiedLinearActivationFunction();
-
-            case 8:
-                return new LeakyRectifiedLinearActivationFunction();
-
-            case 9:
-            default:
-                return new SigmoidActivationFunction();
-        }
+            0 => new TanhActivationFunction(),
+            1 => new StepActivationFunction(),
+            2 => new SinhActivationFunction(),
+            3 => new AbsoluteXActivationFunction(),
+            4 => new SechActivationFunction(),
+            5 => new InverseActivationFunction(),
+            6 => new IdentityActivationFunction(),
+            7 => new RectifiedLinearActivationFunction(),
+            8 => new LeakyRectifiedLinearActivationFunction(),
+            _ => new SigmoidActivationFunction(),
+        };
     }
 
     internal NeuronGene GetRandomHiddenNeuronGene(NeuralNetworkGene networkGenes, int hiddenLayerIndex)
@@ -177,21 +156,13 @@ public class Mutator : IMutator
     internal ISummationFunction GetRandomSummationFunction()
     {
         int value = _random.Next(4);
-        switch (value)
+        return value switch
         {
-            case 0:
-                return new MinSummation();
-
-            case 1:
-                return new AverageSummation();
-
-            case 2:
-                return new MaxSummation();
-
-            case 3:
-            default:
-                return new SimpleSummation();
-        }
+            0 => new MinSummation(),
+            1 => new AverageSummation(),
+            2 => new MaxSummation(),
+            _ => new SimpleSummation(),
+        };
     }
 
     internal NeuralNetworkGene TryAddLayerToNetwork(NeuralNetworkGene genes, double mutateChance, out bool didMutate)

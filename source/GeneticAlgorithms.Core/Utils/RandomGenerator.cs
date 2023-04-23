@@ -10,10 +10,7 @@ public class RandomGenerator
     {
         lock (padlock)
         {
-            if (_random == null)
-            {
-                _random = new Random();
-            }
+            _random ??= new Random();
         }
         return _random; ;
     }

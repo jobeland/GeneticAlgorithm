@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace GeneticAlgorithms.Core.Utils;
 
-public class NeuralNetworkSaver : INeuralNetworkSaver
+public partial class NeuralNetworkSaver : INeuralNetworkSaver
 {
     private readonly string _directory;
 
@@ -26,8 +26,11 @@ public class NeuralNetworkSaver : INeuralNetworkSaver
         return filename;
     }
 
-    internal string MinifyJson(string json)
+    internal static string MinifyJson(string json)
     {
-        return Regex.Replace(json, "(\"(?:[^\"\\\\]|\\\\.)*\")|\\s+", "$1");
+        return MyRegex().Replace(json, "$1");
     }
+
+    [GeneratedRegex("(\"(?:[^\"\\\\]|\\\\.)*\")|\\s+")]
+    private static partial Regex MyRegex();
 }

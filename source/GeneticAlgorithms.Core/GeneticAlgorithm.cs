@@ -11,6 +11,7 @@ namespace GeneticAlgorithms.Core;
 public class GeneticAlgorithm : IGeneticAlgorithm
 {
     private readonly IBreeder _breeder;
+    private readonly IEpochAction? _epochAction;
     private readonly IEvaluatableFactory _evaluatableFactory;
     private readonly EvolutionConfigurationSettings _evolutionConfig;
     private readonly GenerationConfigurationSettings _generationConfig;
@@ -21,7 +22,6 @@ public class GeneticAlgorithm : IGeneticAlgorithm
     private readonly INeuralNetworkFactory _networkFactory;
 
     private ITrainingSession? _bestPerformerOfEpoch;
-    private IEpochAction? _epochAction;
     private IGeneration _generation;
 
     private GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory,
@@ -74,18 +74,19 @@ public class GeneticAlgorithm : IGeneticAlgorithm
             {
                 if (generation == 0)
                 {
-                    _logger.LogInformation($"Creating next generation with top performer with eval: {_bestPerformerOfEpoch?.GetSessionEvaluation()}");
+                    _logger.LogInformation("Creating next generation with top performer with eval: {BestPerformerEvaluation}", _bestPerformerOfEpoch?.GetSessionEvaluation());
 
-                    createNextGeneration(_bestPerformerOfEpoch);
+                    CreateNextGeneration(_bestPerformerOfEpoch);
                 }
                 else
                 {
-                    createNextGeneration(null);
+                    CreateNextGeneration(null);
                 }
                 _generation.Run();
 
                 IEnumerable<double> evals = _generation.GetEvalsForGeneration().OrderByDescending(d => d);
                 int evalsTotalCount = evals.Count();
+
                 if (_evolutionConfig.NumTopEvalsToReport > 0)
                 {
                     evals = evals.Take(_evolutionConfig.NumTopEvalsToReport);
@@ -97,9 +98,9 @@ public class GeneticAlgorithm : IGeneticAlgorithm
                     sb.AppendLine($"eval: {t}");
                 }
 
-                _logger.LogInformation(sb.ToString());
-                _logger.LogInformation($"count: {evalsTotalCount}");
-                _logger.LogInformation($"Epoch: {epoch},  Generation: {generation}");
+                _logger.LogInformation("{Evaluations}", sb.ToString());
+                _logger.LogInformation("count: {EvaluationsTotalCount}", evalsTotalCount);
+                _logger.LogInformation("Epoch: {Epoch},  Generation: {Generation}", epoch, generation);
             }
             if (_epochAction != null)
             {
@@ -142,10 +143,9 @@ public class GeneticAlgorithm : IGeneticAlgorithm
     {
         //try to mutate session that will live on 1 by 1
         List<INeuralNetwork> mutatedTop = new();
-        bool didMutate;
         foreach (INeuralNetwork topPerformer in networksToTryToMutate)
         {
-            INeuralNetwork net = _mutator.Mutate(topPerformer, mutateChance, out didMutate);
+            INeuralNetwork net = _mutator.Mutate(topPerformer, mutateChance, out bool didMutate);
             if (didMutate)
             {
                 mutatedTop.Add(net);
@@ -175,7 +175,42 @@ public class GeneticAlgorithm : IGeneticAlgorithm
         saver.SaveNeuralNetwork(bestPerformer.NeuralNet, bestPerformer.GetSessionEvaluation(), epoch);
     }
 
-    private void createNextGeneration(ITrainingSession? bestPerformer)
+    private static IList<int> DetermineHiddenLayerSpec(int defaultNumNeurons, int defaultNumHiddenLayers, double mutateChance)
+    {
+        Random random = new();
+        int numHiddenLayers = RandomizeNumber(defaultNumHiddenLayers, mutateChance, random);
+        List<int> spec = new();
+        for (int i = 0; i < numHiddenLayers; i++)
+        {
+            int newLayerSize = RandomizeNumber(defaultNumNeurons, mutateChance, random);
+            spec.Add(newLayerSize);
+        }
+        return spec;
+    }
+
+    private static int RandomizeNumber(int seedNumber, double randomizeChance, Random random)
+    {
+        int numToReturn = seedNumber;
+        bool increase = !(random.NextDouble() <= 0.5);
+        while (random.NextDouble() <= randomizeChance)
+        {
+            if (!increase && numToReturn == 1)
+            {
+                break;
+            }
+            if (!increase)
+            {
+                numToReturn--;
+            }
+            else
+            {
+                numToReturn++;
+            }
+        }
+        return numToReturn;
+    }
+
+    private void CreateNextGeneration(ITrainingSession? bestPerformer)
     {
         Stopwatch watch = new();
         watch.Start();
@@ -196,12 +231,12 @@ public class GeneticAlgorithm : IGeneticAlgorithm
 
             if (sessions.All(s => s.NeuralNet.GetGenes() != bestPerformer.NeuralNet.GetGenes()))
             {
-                _logger.LogInformation($"Best performer adding to sessions with eval {bestPerformer.GetSessionEvaluation()}");
+                _logger.LogInformation("Best performer adding to sessions with eval {BestPerformerEvaluation}", bestPerformer.GetSessionEvaluation());
 
                 sessions[sessions.Count - 1] = bestPerformer;
                 sessions = sessions.OrderByDescending(s => s.GetSessionEvaluation()).ToList();
 
-                _logger.LogInformation($"session 0 eval: {sessions[0].GetSessionEvaluation()}");
+                _logger.LogInformation("session 0 eval: {SessionEvaluation}", sessions[0].GetSessionEvaluation());
             }
             else
             {
@@ -227,14 +262,13 @@ public class GeneticAlgorithm : IGeneticAlgorithm
         sessions = sessions.Skip(numToLiveOn).ToList();
         IEnumerable<ITrainingSession> sessionSubset = sessions.Take(sessions.Count - mutatedTop.Count);
         IList<INeuralNetwork> toKeepButPossiblyMutate = sessionSubset.Select(session => session.NeuralNet).ToList();
-        IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen, mutateChance);
+        IList<INeuralNetwork> newNetworks = GetNewNetworks(numToGen, mutateChance);
 
         List<INeuralNetwork> toTryMutate = new();
         //try to mutate both new networks as well as all the top performers we wanted to keep
         toTryMutate.AddRange(toKeepButPossiblyMutate);
         toTryMutate.AddRange(newNetworks);
-        bool didMutate;
-        IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, mutateChance, out didMutate);
+        IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, mutateChance, out bool didMutate);
 
         List<INeuralNetwork> allToAdd = new();
         allToAdd.AddRange(mutatedTop);
@@ -245,55 +279,20 @@ public class GeneticAlgorithm : IGeneticAlgorithm
         _generation = new Generation(newSessions, _generationConfig);
 
         watch.Stop();
-        _logger.LogInformation($"create generation runtime (sec): {watch.Elapsed.TotalSeconds}");
+        _logger.LogInformation("create generation runtime (sec): {TotalSeconds}", watch.Elapsed.TotalSeconds);
         watch.Reset();
     }
 
-    private IList<int> determineHiddenLayerSpec(int defaultNumNeurons, int defaultNumHiddenLayers, double mutateChance)
-    {
-        Random random = new();
-        int numHiddenLayers = randomizeNumber(defaultNumHiddenLayers, mutateChance, random);
-        List<int> spec = new();
-        for (int i = 0; i < numHiddenLayers; i++)
-        {
-            int newLayerSize = randomizeNumber(defaultNumNeurons, mutateChance, random);
-            spec.Add(newLayerSize);
-        }
-        return spec;
-    }
-
-    private List<INeuralNetwork> getNewNetworks(int numToGen, double mutateChance)
+    private List<INeuralNetwork> GetNewNetworks(int numToGen, double mutateChance)
     {
         List<INeuralNetwork> newNets = new();
         for (int i = 0; i < numToGen; i++)
         {
-            IList<int> hiddenSpecs = determineHiddenLayerSpec(_networkConfig.NumInputNeurons,
+            IList<int> hiddenSpecs = DetermineHiddenLayerSpec(_networkConfig.NumInputNeurons,
                 _networkConfig.NumHiddenLayers, mutateChance);
             INeuralNetwork newNet = _networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, hiddenSpecs);
             newNets.Add(newNet);
         }
         return newNets;
-    }
-
-    private int randomizeNumber(int seedNumber, double randomizeChance, Random random)
-    {
-        int numToReturn = seedNumber;
-        bool increase = !(random.NextDouble() <= 0.5);
-        while (random.NextDouble() <= randomizeChance)
-        {
-            if (!increase && numToReturn == 1)
-            {
-                break;
-            }
-            if (!increase)
-            {
-                numToReturn--;
-            }
-            else
-            {
-                numToReturn++;
-            }
-        }
-        return numToReturn;
     }
 }

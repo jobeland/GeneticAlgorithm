@@ -6,9 +6,9 @@ namespace GeneticAlgorithms.Core.Evolution;
 
 public class Breeder : IBreeder
 {
+    private readonly double _motherFatherBias;
     private readonly INeuralNetworkFactory _networkFactory;
     private readonly IWeightInitializer _weightInitializer;
-    private double _motherFatherBias;
 
     private Breeder(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, double motherFatherBias = 0.5)
     {
@@ -36,7 +36,7 @@ public class Breeder : IBreeder
             ITrainingSession session2 = weightedSessions.ChooseRandomWeightedSession();
             INeuralNetwork father = session2.NeuralNet;
 
-            INeuralNetwork child = mate(mother, father);
+            INeuralNetwork child = Mate(mother, father);
             children.Add(child);
         }
 
@@ -126,7 +126,7 @@ public class Breeder : IBreeder
         return toReturn;
     }
 
-    internal INeuralNetwork mate(INeuralNetwork mother, INeuralNetwork father)
+    internal INeuralNetwork Mate(INeuralNetwork mother, INeuralNetwork father)
     {
         NeuralNetworkGene motherGenes = mother.GetGenes();
         NeuralNetworkGene childFatherGenes = father.GetGenes();
